@@ -10,8 +10,14 @@ export class CronService {
     @InjectRepository(Cron) private cronsRepository: Repository<Cron>,
   ) {}
 
+  // return all the crons info with the most recent job details
   getAll(): Promise<Cron[]> {
-    return this.cronsRepository.find();
+    return this.cronsRepository
+      .createQueryBuilder('cron')
+      .leftJoinAndSelect('cron.jobs', 'job')
+      .orderBy('job.sentAt', 'DESC')
+      .limit(1)
+      .getMany();
   }
 
   getById(id: string): Promise<Cron> {

@@ -1,5 +1,5 @@
 import { Cron } from 'src/cron/cron.entity';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('', {
   orderBy: {
@@ -10,8 +10,8 @@ export class Job {
   @PrimaryColumn()
   id: string;
 
-  @ManyToOne((type) => Cron, (cron) => cron.id)
-  cron: string;
+  @ManyToOne((type) => Cron, (cron) => cron.jobs)
+  cron: Cron;
 
   @Column()
   emailSender: string;

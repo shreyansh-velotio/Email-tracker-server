@@ -2,13 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './job.entity';
 import { Repository } from 'typeorm';
-import Bull from 'bull';
+import { Cron } from 'src/cron/cron.entity';
 
 @Injectable()
 export class JobService {
-  constructor(@InjectRepository(Job) private jobsRepository: Repository<Job>) {}
+  constructor(
+    @InjectRepository(Job) private jobsRepository: Repository<Job>,
+    @InjectRepository(Cron) private cronsRepository: Repository<Cron>,
+  ) {}
 
-  create(
+  async create(
     id: string,
     cronId: string,
     emailSender: string,
@@ -18,12 +21,13 @@ export class JobService {
   ): Promise<Job> {
     const job = this.jobsRepository.create({
       id,
-      cron: cronId,
       emailSender,
       emailReceiver,
       sentAt,
       isEmailSent,
     });
+
+    job.cron = await this.cronsRepository.findOne(cronId);
 
     return this.jobsRepository.save(job);
   }

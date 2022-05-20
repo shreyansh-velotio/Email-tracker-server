@@ -12,6 +12,6 @@ export class Cron {
   @Column()
   message: string;
 
-  @OneToMany((type) => Job, (job) => job.id)
-  projects: Job[];
+  @OneToMany((type) => Job, (job) => job.cron)
+  jobs: Job[];
 }
