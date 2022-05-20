@@ -27,4 +27,14 @@ export class JobService {
 
     return this.jobsRepository.save(job);
   }
+
+  // get recent top 10 job entries of the cron
+  getJobHistory(cron: string) {
+    const jobs = this.jobsRepository.find({
+      where: { cron },
+      take: 10,
+    });
+
+    return jobs;
+  }
 }

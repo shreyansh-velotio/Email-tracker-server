@@ -1,7 +1,11 @@
 import { Cron } from 'src/cron/cron.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('', {
+  orderBy: {
+    sentAt: 'DESC',
+  },
+})
 export class Job {
   @PrimaryColumn()
   id: string;

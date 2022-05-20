@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  main:
-    container_name: main
+  server:
+    container_name: server
     build:
       context: .
       target: development
@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
     networks:
-      - webnet
+      - backend
     depends_on:
       - redis
       - postgres
@@ -23,7 +23,7 @@ services:
     container_name: redis
     image: redis:5
     networks:
-      - webnet
+      - backend
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
@@ -32,7 +32,7 @@ services:
     container_name: redis-commander
     image: rediscommander/redis-commander
     networks:
-      - webnet
+      - backend
     restart: always
     environment:
       - REDIS_HOSTS=local:redis:6379
@@ -46,7 +46,7 @@ services:
     container_name: postgres
     image: postgres:12
     networks:
-      - webnet
+      - backend
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
@@ -57,6 +57,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 networks:
-  webnet:
+  backend:
 volumes:
   pgdata:
