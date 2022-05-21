@@ -22,7 +22,6 @@ export class CreateCronDto {
   @Transform(({ value }) => parseInt(value))
   frequency: number;
 
-  @IsString()
   @IsNotEmpty()
   message: string;
 }

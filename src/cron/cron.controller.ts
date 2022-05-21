@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -25,7 +26,7 @@ export class CronController {
   }
 
   @Get('/jobs')
-  async getJobs(@Query('id') id: string) {
+  async getJobs(@Query('id', new ParseUUIDPipe()) id: string) {
     return await this.jobService.getJobHistory(id);
   }
 

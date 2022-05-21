@@ -1,5 +1,10 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Job, Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 import { CreateCronDto, UpdateCronDto } from './cron.dto';
@@ -49,10 +54,12 @@ export class CronProducerService {
       );
     } catch (err) {
       this.logger.error(err);
+
+      throw new InternalServerErrorException();
     }
   }
 
-  async updateCron(dto: UpdateCronDto) {
+  async updateCron(dto: UpdateCronDto): Promise<Cron> {
     try {
       const cron: Cron = await this.cronService.getById(dto.id);
 
@@ -76,20 +83,20 @@ export class CronProducerService {
         );
 
         // update the cron in the db
-        await this.cronService.update(dto);
-
-        return {
-          status: 'success',
-        };
+        return await this.cronService.update(dto);
       } else {
-        throw new NotFoundException();
+        throw new NotFoundException(
+          `Unable to find a cron with the id ${dto.id}`,
+        );
       }
     } catch (err) {
       this.logger.error(err);
 
-      return {
-        status: 'error',
-      };
+      if (err instanceof NotFoundException) {
+        throw new NotFoundException(err.message);
+      }
+
+      throw new InternalServerErrorException();
     }
   }
 }

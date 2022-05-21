@@ -12,16 +12,21 @@ export class CronService {
 
   // return all the crons info with the most recent job details
   getAll(): Promise<Cron[]> {
-    return this.cronsRepository
+    return this.cronsRepository.find();
+    /**
+     * @note
+     * Left join in typeorm
+     * 
+     * return this.cronsRepository.
       .createQueryBuilder('cron')
       .leftJoinAndSelect('cron.jobs', 'job')
       .orderBy('job.sentAt', 'DESC')
-      .limit(1)
       .getMany();
+     */
   }
 
   getById(id: string): Promise<Cron> {
-    return this.cronsRepository.findOneOrFail(id);
+    return this.cronsRepository.findOne(id);
   }
 
   create(dto: CronDto): Promise<Cron> {

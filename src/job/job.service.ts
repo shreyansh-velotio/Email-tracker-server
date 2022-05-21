@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './job.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +11,8 @@ import { Cron } from 'src/cron/cron.entity';
 
 @Injectable()
 export class JobService {
+  private readonly logger = new Logger(JobService.name);
+
   constructor(
     @InjectRepository(Job) private jobsRepository: Repository<Job>,
     @InjectRepository(Cron) private cronsRepository: Repository<Cron>,
@@ -33,12 +40,25 @@ export class JobService {
   }
 
   // get recent top 10 job entries of the cron
-  getJobHistory(cron: string) {
-    const jobs = this.jobsRepository.find({
-      where: { cron },
-      take: 10,
-    });
+  async getJobHistory(cron: string) {
+    try {
+      const jobs = await this.jobsRepository.find({
+        where: { cron },
+        take: 10,
+      });
 
-    return jobs;
+      if (jobs.length === 0)
+        throw new NotFoundException(
+          `Not found any job related to the cron ${cron}`,
+        );
+
+      return jobs;
+    } catch (err) {
+      this.logger.error(err);
+
+      if (err instanceof NotFoundException)
+        throw new NotFoundException(err.message);
+      throw new InternalServerErrorException();
+    }
   }
 }
