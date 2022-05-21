@@ -78,6 +78,13 @@ export class CronProducerService {
           {
             repeat: {
               every: dto.frequency * 1000,
+
+              /**
+               * @note
+               * Remove the limit option only here for development
+               * so that my email don't get spammed
+               */
+              limit: 3,
             },
           },
         );
