@@ -7,9 +7,7 @@ import { MailgunModule } from 'src/mailgun/mailgun.module';
 import { Cron } from './cron.entity';
 import { CronController } from './cron.controller';
 import { CronProducerService } from './cron.producer.service';
-import { CronConsumerService } from './cron.consumer.service';
 import { CronService } from './cron.service';
-import { JobModule } from 'src/job/job.module';
 
 @Module({
   imports: [
@@ -23,11 +21,10 @@ import { JobModule } from 'src/job/job.module';
     BullModule.registerQueue({
       name: 'email-queue',
     }),
-    JobModule,
     MailgunModule,
   ],
   controllers: [CronController],
-  providers: [CronService, CronProducerService, CronConsumerService],
-  exports: [CronService, CronProducerService, CronConsumerService],
+  providers: [CronService, CronProducerService],
+  exports: [CronService, CronProducerService],
 })
 export class CronModule {}

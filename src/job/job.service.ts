@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './job.entity';
 import { Repository } from 'typeorm';
 import { Cron } from 'src/cron/cron.entity';
+import { CronService } from 'src/cron/cron.service';
 
 @Injectable()
 export class JobService {
@@ -15,7 +16,7 @@ export class JobService {
 
   constructor(
     @InjectRepository(Job) private jobsRepository: Repository<Job>,
-    @InjectRepository(Cron) private cronsRepository: Repository<Cron>,
+    private cronService: CronService,
   ) {}
 
   async create(
@@ -34,7 +35,7 @@ export class JobService {
       isEmailSent,
     });
 
-    job.cron = await this.cronsRepository.findOne(cronId);
+    job.cron = await this.cronService.getById(cronId);
 
     return this.jobsRepository.save(job);
   }

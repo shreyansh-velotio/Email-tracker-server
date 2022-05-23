@@ -1,5 +1,5 @@
-import { Cron } from 'src/cron/cron.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Cron } from '../cron/cron.entity';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('', {
   orderBy: {

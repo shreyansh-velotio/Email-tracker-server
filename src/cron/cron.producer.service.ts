@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Job, Queue } from 'bull';
+import { Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 import { CreateCronDto, UpdateCronDto } from './cron.dto';
 import { Cron } from './cron.entity';

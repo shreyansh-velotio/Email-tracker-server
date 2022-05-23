@@ -6,9 +6,15 @@ import { ConfigModule } from '@nestjs/config';
 
 import config from 'ormconfig';
 import { CronModule } from './cron/cron.module';
+import { JobModule } from './job/job.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), TypeOrmModule.forRoot(config), CronModule],
+  imports: [
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot(config),
+    CronModule,
+    JobModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

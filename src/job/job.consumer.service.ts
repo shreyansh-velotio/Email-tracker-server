@@ -5,8 +5,8 @@ import { JobService } from 'src/job/job.service';
 import { MailgunService } from 'src/mailgun/mailgun.service';
 
 @Processor('email-queue')
-export class CronConsumerService {
-  private readonly logger = new Logger(CronConsumerService.name);
+export class JobConsumerService {
+  private readonly logger = new Logger(JobConsumerService.name);
 
   constructor(
     private readonly mailgunService: MailgunService,
