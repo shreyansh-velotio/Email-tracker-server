@@ -44,14 +44,11 @@ export class CronProducerService {
       );
 
       // adding the cron to the db
-      return (
-        cron &&
-        (await this.cronService.create({
-          id,
-          message: dto.message,
-          frequency: dto.frequency,
-        }))
-      );
+      return await this.cronService.create({
+        id,
+        message: dto.message,
+        frequency: dto.frequency,
+      });
     } catch (err) {
       this.logger.error(err);
 
