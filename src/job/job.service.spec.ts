@@ -4,6 +4,7 @@ import { CronService } from '../cron/cron.service';
 import { Repository } from 'typeorm';
 import { Job } from './job.entity';
 import { JobService } from './job.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('Job Service', () => {
   let jobService: JobService;
@@ -202,6 +203,18 @@ describe('Job Service', () => {
         where: { cron: CRON_ID },
         take: 10,
       });
+    });
+
+    it('should call throw NotFoundException', async () => {
+      jest.spyOn(jobRepository, 'find').mockResolvedValue([]);
+
+      try {
+        await jobService.getJobHistory(CRON_ID);
+      } catch (err) {
+        expect(err.message).toBe(
+          `Not found any job related to the cron ${CRON_ID}`,
+        );
+      }
     });
   });
 });
