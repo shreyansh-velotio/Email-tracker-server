@@ -25,7 +25,7 @@ export class CronProducerService {
       const id: string = uuid();
 
       // add cron to the queue
-      const cron = await this.queue.add(
+      await this.queue.add(
         id,
         {
           message: dto.message,

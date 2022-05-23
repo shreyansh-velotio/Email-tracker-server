@@ -1,12 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ApiOkResponse } from '@nestjs/swagger';
 
-@Controller()
+@Controller('/ping')
 export class AppController {
   constructor(private appService: AppService) {}
 
   @Get()
-  hello() {
+  @ApiOkResponse({ description: 'Base route' })
+  getHello() {
     return this.appService.getHello();
   }
 }
