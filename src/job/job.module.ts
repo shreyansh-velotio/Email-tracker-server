@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import Mailgun from 'mailgun.js';
-import { Cron } from 'src/cron/cron.entity';
-import { CronModule } from 'src/cron/cron.module';
+import { Cron } from '../cron/cron.entity';
+import { CronModule } from '../cron/cron.module';
+import { JobConsumerService } from './job.consumer.service';
 import { JobController } from './job.controller';
 import { Job } from './job.entity';
 import { JobService } from './job.service';
+import { MailgunModule } from '../mailgun/mailgun.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Job, Cron]), CronModule, Mailgun],
+  imports: [TypeOrmModule.forFeature([Job, Cron]), CronModule, MailgunModule],
   controllers: [JobController],
-  providers: [JobService],
-  exports: [JobService],
+  providers: [JobService, JobConsumerService],
+  exports: [JobService, JobConsumerService],
 })
 export class JobModule {}

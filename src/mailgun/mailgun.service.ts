@@ -5,7 +5,7 @@ import * as formData from 'form-data';
 // mailgun SDK setup
 const mailgun = new Mailgun(formData).client({
   username: 'api',
-  key: process.env.MAILGUN_APIKEY,
+  key: process.env.MAILGUN_APIKEY || 'dummy-api-for-jest',
 });
 
 @Injectable()

@@ -13,7 +13,7 @@ describe('Cron-Job Consumer Service', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        JobService,
+        JobConsumerService,
         {
           provide: JobService,
           useValue: {
@@ -45,4 +45,12 @@ describe('Cron-Job Consumer Service', () => {
   it('mailgun service should be defined', () => {
     expect(mailgunService).toBeDefined();
   });
+
+  // describe('readOperationJob', () => {
+  //   it('should call mailgunService.sendEmail', async () => {
+  //     const job: Job<CronJob> =
+
+  //     await jobConsumerService.readOperationJob(job);
+  //   });
+  // });
 });

@@ -1,8 +1,9 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { JobService } from 'src/job/job.service';
-import { MailgunService } from 'src/mailgun/mailgun.service';
+import { Job as CronJob } from './job.entity';
+import { JobService } from './job.service';
+import { MailgunService } from '../mailgun/mailgun.service';
 
 @Processor('email-queue')
 export class JobConsumerService {
@@ -14,8 +15,10 @@ export class JobConsumerService {
   ) {}
 
   @Process('*')
-  async readOperationJob(job: Job) {
+  async readOperationJob(job: Job<CronJob>) {
     try {
+      console.log(job);
+
       const { id: jobId, name: cronId } = job;
       const payload = job.data;
 
