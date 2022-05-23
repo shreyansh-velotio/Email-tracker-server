@@ -7,15 +7,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './job.entity';
 import { Repository } from 'typeorm';
-import { Cron } from 'src/cron/cron.entity';
-import { CronService } from 'src/cron/cron.service';
+import { CronService } from '../cron/cron.service';
 
 @Injectable()
 export class JobService {
   private readonly logger = new Logger(JobService.name);
 
   constructor(
-    @InjectRepository(Job) private jobsRepository: Repository<Job>,
+    @InjectRepository(Job) private jobRepository: Repository<Job>,
     private cronService: CronService,
   ) {}
 
@@ -27,7 +26,7 @@ export class JobService {
     sentAt: Date,
     isEmailSent: boolean,
   ): Promise<Job> {
-    const job = this.jobsRepository.create({
+    const job = this.jobRepository.create({
       id,
       emailSender,
       emailReceiver,
@@ -37,13 +36,13 @@ export class JobService {
 
     job.cron = await this.cronService.getById(cronId);
 
-    return this.jobsRepository.save(job);
+    return this.jobRepository.save(job);
   }
 
   // get recent top 10 job entries of the cron
   async getJobHistory(cron: string) {
     try {
-      const jobs = await this.jobsRepository.find({
+      const jobs = await this.jobRepository.find({
         where: { cron },
         take: 10,
       });
@@ -56,6 +55,8 @@ export class JobService {
       return jobs;
     } catch (err) {
       this.logger.error(err);
+
+      console.log(err);
 
       if (err instanceof NotFoundException)
         throw new NotFoundException(err.message);

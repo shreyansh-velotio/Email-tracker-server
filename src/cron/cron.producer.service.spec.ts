@@ -18,6 +18,8 @@ describe('Cron Producer Service', () => {
   const QUEUE_TOKEN = getQueueToken('email-queue');
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CronProducerService,

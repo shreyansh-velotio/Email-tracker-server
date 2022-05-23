@@ -14,6 +14,8 @@ describe('Cron Service', () => {
   const CRON_REPOSITORY_TOKEN = getRepositoryToken(Cron);
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CronService,
