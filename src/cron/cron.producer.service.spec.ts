@@ -189,5 +189,20 @@ describe('Cron Producer Service', () => {
         frequency: 20,
       });
     });
+
+    it('should return 404 when cronService.getById is unable to find cron', async () => {
+      const id: string = UUID;
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(undefined);
+
+      try {
+        await cronProducerService.updateCron({
+          id,
+          frequency: 20,
+        });
+      } catch (err) {
+        expect(err.message).toBe(`Unable to find a cron with the id ${id}`);
+      }
+    });
   });
 });

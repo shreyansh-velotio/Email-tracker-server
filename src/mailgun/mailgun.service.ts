@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import Mailgun from 'mailgun.js';
 import * as formData from 'form-data';
 
