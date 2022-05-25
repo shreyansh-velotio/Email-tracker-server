@@ -1,22 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-// import mockMailgun from 'mailgun.js';
-// import * as formData from 'form-data';
 import { MailgunService } from './mailgun.service';
-// import Options from 'mailgun.js/interfaces/Options';
-
-// jest.mock('mailgun.js', () => {
-//   class mockMailgun {
-//     constructor(private formData: FormData) {}
-//     client(options: Options) {
-//       return {
-//         messages: jest.fn().mockReturnThis(),
-//         send: jest.fn(),
-//       };
-//     }
-//   }
-
-//   return jest.fn(() => mockMailgun);
-// });
 
 describe('Mailgun Service', () => {
   let mailgunService: MailgunService;
@@ -33,5 +16,28 @@ describe('Mailgun Service', () => {
 
   it('mailgun service should be defined', () => {
     expect(mailgunService).toBeDefined();
+  });
+
+  it('MAILGUN_APIKEY should be defined', () => {
+    expect(process.env.MAILGUN_APIKEY).toBeDefined();
+  });
+
+  it('MAILGUN_DOMAIN should be defined', () => {
+    expect(process.env.MAILGUN_DOMAIN).toBeDefined();
+  });
+
+  it('MAILGUN_SENDER should be defined', () => {
+    expect(process.env.MAILGUN_SENDER).toBeDefined();
+  });
+  it('MAILGUN_RECEIVER should be defined', () => {
+    expect(process.env.MAILGUN_RECEIVER).toBeDefined();
+  });
+
+  describe('send Email', () => {
+    it('should call mailgun.messages.create', async () => {
+      await mailgunService.sendEmail({
+        message: 'Hello World!',
+      });
+    });
   });
 });
