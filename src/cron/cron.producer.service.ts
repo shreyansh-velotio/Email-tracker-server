@@ -7,8 +7,9 @@ import {
 } from '@nestjs/common';
 import { Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
-import { CreateCronDto, UpdateCronDto } from './cron.dto';
-import { Cron } from './cron.entity';
+import { CreateCronDto } from './dtos/create-cron.dto';
+import { UpdateCronDto } from './dtos/update-cron.dto';
+import { Cron } from './entities/cron.entity';
 import { CronService } from './cron.service';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { Job } from '../job/job.entity';
+import { Job } from '../../job/entities/job.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 

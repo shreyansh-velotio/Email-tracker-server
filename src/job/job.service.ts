@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Job } from './job.entity';
+import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { CronService } from '../cron/cron.service';
 

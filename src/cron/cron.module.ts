@@ -4,7 +4,7 @@ import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailgunModule } from 'src/mailgun/mailgun.module';
 
-import { Cron } from './cron.entity';
+import { Cron } from './entities/cron.entity';
 import { CronController } from './cron.controller';
 import { CronProducerService } from './cron.producer.service';
 import { CronService } from './cron.service';

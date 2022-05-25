@@ -1,5 +1,6 @@
 import { Controller, Get, Patch, Post, Query } from '@nestjs/common';
-import { CreateCronDto, UpdateCronDto } from './cron.dto';
+import { CreateCronDto } from './dtos/create-cron.dto';
+import { UpdateCronDto } from './dtos/update-cron.dto';
 import { CronProducerService } from './cron.producer.service';
 import { CronService } from './cron.service';
 import {

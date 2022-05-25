@@ -2,9 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CronService } from '../cron/cron.service';
 import { Repository } from 'typeorm';
-import { Job } from './job.entity';
+import { Job } from './entities/job.entity';
 import { JobService } from './job.service';
-import { NotFoundException } from '@nestjs/common';
 
 describe('Job Service', () => {
   let jobService: JobService;

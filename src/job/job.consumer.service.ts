@@ -1,7 +1,5 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
-// import { Job } from 'bull';
-// import { Job as CronJob } from './job.entity';
 import { JobService } from './job.service';
 import { MailgunService } from '../mailgun/mailgun.service';
 

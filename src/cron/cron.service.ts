@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cron } from './cron.entity';
+import { Cron } from './entities/cron.entity';
 import { Repository } from 'typeorm';
-import { CronDto, UpdateCronDto } from './cron.dto';
+import { CronDto } from './dtos/cron.dto';
+import { UpdateCronDto } from './dtos/update-cron.dto';
 
 @Injectable()
 export class CronService {

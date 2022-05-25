@@ -1,4 +1,4 @@
-import { Cron } from '../cron/cron.entity';
+import { Cron } from '../../cron/entities/cron.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 

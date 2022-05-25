@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Cron } from './cron.entity';
+import { Cron } from './entities/cron.entity';
 import { CronService } from './cron.service';
 import { v4 as uuid } from 'uuid';
 
