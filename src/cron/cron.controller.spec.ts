@@ -3,7 +3,6 @@ import { CronController } from './cron.controller';
 import { CronProducerService } from './cron.producer.service';
 import { CronService } from './cron.service';
 
-// mocking the uuid
 const UUID = '046fc812-6764-4850-8657-4b30f4802544';
 
 describe('Cron controller', () => {

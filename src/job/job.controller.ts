@@ -4,7 +4,6 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 
 @Controller('/cron-job')
