@@ -3,6 +3,10 @@ import { MailgunService } from '../mailgun/mailgun.service';
 import { JobConsumerService } from './job.consumer.service';
 import { JobService } from './job.service';
 
+const CRON_ID = '046fc812-6764-4850-8657-4b30f4802544';
+const JOB_ID = 'repeat:3d3d35f16a53906c841e09da946fa35b:1653071610000';
+const DATE = new Date();
+
 describe('Cron-Job Consumer Service', () => {
   let jobConsumerService: JobConsumerService;
   let mailgunService: MailgunService;
@@ -46,11 +50,35 @@ describe('Cron-Job Consumer Service', () => {
     expect(mailgunService).toBeDefined();
   });
 
-  // describe('readOperationJob', () => {
-  //   it('should call mailgunService.sendEmail', async () => {
-  //     const job: Job<CronJob> =
+  describe('readOperationJob', () => {
+    it('should call mailgunService.sendEmail', async () => {
+      const job = {
+        id: JOB_ID,
+        name: CRON_ID,
+        data: {
+          message: 'Hello World!',
+        },
+      };
 
-  //     await jobConsumerService.readOperationJob(job);
-  //   });
-  // });
+      await jobConsumerService.readOperationJob(job);
+
+      expect(mailgunService.sendEmail).toBeCalledWith({
+        message: 'Hello World!',
+      });
+    });
+
+    it('should call jobService.create', async () => {
+      const job = {
+        id: JOB_ID,
+        name: CRON_ID,
+        data: {
+          message: 'Hello World!',
+        },
+      };
+
+      await jobConsumerService.readOperationJob(job);
+
+      expect(jobService.create).toBeCalled();
+    });
+  });
 });
