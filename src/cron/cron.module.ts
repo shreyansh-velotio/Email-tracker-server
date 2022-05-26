@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailgunModule } from 'src/mailgun/mailgun.module';
+import { MailgunModule } from '../mailgun/mailgun.module';
 
 import { Cron } from './entities/cron.entity';
 import { CronController } from './cron.controller';
