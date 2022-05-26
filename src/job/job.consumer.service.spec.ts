@@ -59,6 +59,10 @@ describe('Cron-Job Consumer Service', () => {
           message: 'Hello World!',
         },
       };
+      jest.spyOn(mailgunService, 'sendEmail').mockResolvedValueOnce({
+        status: 200,
+        message: 'Message Queued',
+      });
 
       await jobConsumerService.readOperationJob(job);
 
@@ -75,10 +79,85 @@ describe('Cron-Job Consumer Service', () => {
           message: 'Hello World!',
         },
       };
+      jest.spyOn(mailgunService, 'sendEmail').mockResolvedValueOnce({
+        status: 200,
+        message: 'Message Queued',
+      });
 
       await jobConsumerService.readOperationJob(job);
 
       expect(jobService.create).toBeCalled();
+    });
+
+    it('should throw exception if mailgunService.sendEmail throws exception', async () => {
+      const job = {
+        id: JOB_ID,
+        name: CRON_ID,
+        data: {
+          message: 'Hello World!',
+        },
+      };
+      jest
+        .spyOn(mailgunService, 'sendEmail')
+        .mockRejectedValueOnce(new Error());
+
+      try {
+        await jobConsumerService.readOperationJob(job);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(jobService.create).not.toBeCalled();
+      }
+    });
+
+    it('should throw exception if jobService.create throws exception', async () => {
+      const job = {
+        id: JOB_ID,
+        name: CRON_ID,
+        data: {
+          message: 'Hello World!',
+        },
+      };
+      jest.spyOn(mailgunService, 'sendEmail').mockResolvedValueOnce({
+        status: 200,
+        message: 'Message Queued',
+      });
+      jest.spyOn(jobService, 'create').mockRejectedValueOnce(new Error());
+
+      try {
+        await jobConsumerService.readOperationJob(job);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should send an email and create a job', async () => {
+      const job = {
+        id: JOB_ID,
+        name: CRON_ID,
+        data: {
+          message: 'Hello World!',
+        },
+      };
+      jest.spyOn(mailgunService, 'sendEmail').mockResolvedValueOnce({
+        status: 200,
+        message: 'Message Queued',
+      });
+      jest.spyOn(jobService, 'create').mockResolvedValueOnce({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: {
+          id: CRON_ID,
+          frequency: 10,
+          message: 'Cron test email',
+          jobs: [],
+        },
+      });
+
+      const email = await jobConsumerService.readOperationJob(job);
+      expect(email.status).toBe(200);
     });
   });
 });
