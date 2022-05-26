@@ -40,27 +40,15 @@ export class JobService {
   }
 
   // get recent top 10 job entries of the cron
-  async getJobHistory(cron: string) {
-    try {
-      const jobs = await this.jobRepository.find({
-        where: { cron },
+  async getJobHistory(cronId: string) {
+    const cron = await this.cronService.getById(cronId);
+    if (cron) {
+      return await this.jobRepository.find({
+        where: { cron: cronId },
         take: 10,
       });
-
-      if (jobs.length === 0)
-        throw new NotFoundException(
-          `Not found any job related to the cron ${cron}`,
-        );
-
-      return jobs;
-    } catch (err) {
-      this.logger.error(err);
-
-      console.log(err);
-
-      if (err instanceof NotFoundException)
-        throw new NotFoundException(err.message);
-      throw new InternalServerErrorException();
+    } else {
+      throw new NotFoundException(`No cron found with an id ${cronId}`);
     }
   }
 }

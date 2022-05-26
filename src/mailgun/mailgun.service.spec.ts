@@ -35,9 +35,11 @@ describe('Mailgun Service', () => {
 
   describe('send Email', () => {
     it('should call mailgun.messages.create', async () => {
-      await mailgunService.sendEmail({
+      const res = await mailgunService.sendEmail({
         message: 'Hello World!',
       });
+
+      expect(res.status).toBe(200);
     });
   });
 });

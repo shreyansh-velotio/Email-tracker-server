@@ -4,6 +4,8 @@ import { CronService } from '../cron/cron.service';
 import { Repository } from 'typeorm';
 import { Job } from './entities/job.entity';
 import { JobService } from './job.service';
+import { NotFoundException } from '@nestjs/common';
+import { Cron } from '../cron/entities/cron.entity';
 
 describe('Job Service', () => {
   let jobService: JobService;
@@ -64,12 +66,7 @@ describe('Job Service', () => {
         emailReceiver: process.env.MAILGUN_RECEIVER,
         sentAt: DATE,
         isEmailSent: true,
-        cron: {
-          id: CRON_ID,
-          message: 'Cron creation test',
-          frequency: 10,
-          jobs: [],
-        },
+        cron: undefined,
       });
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
@@ -104,12 +101,7 @@ describe('Job Service', () => {
         emailReceiver: process.env.MAILGUN_RECEIVER,
         sentAt: DATE,
         isEmailSent: true,
-        cron: {
-          id: CRON_ID,
-          message: 'Cron creation test',
-          frequency: 10,
-          jobs: [],
-        },
+        cron: undefined,
       });
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
@@ -138,12 +130,7 @@ describe('Job Service', () => {
         emailReceiver: process.env.MAILGUN_RECEIVER,
         sentAt: DATE,
         isEmailSent: true,
-        cron: {
-          id: CRON_ID,
-          message: 'Cron creation test',
-          frequency: 10,
-          jobs: [],
-        },
+        cron: undefined,
       });
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
@@ -176,11 +163,124 @@ describe('Job Service', () => {
         },
       });
     });
+
+    it('should throw exception if cronService.getById throws exception', async () => {
+      jest.spyOn(jobRepository, 'create').mockReturnValueOnce({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: undefined,
+      });
+
+      jest.spyOn(cronService, 'getById').mockRejectedValueOnce(new Error());
+
+      try {
+        await jobService.create(
+          JOB_ID,
+          CRON_ID,
+          process.env.MAILGUN_SENDER,
+          process.env.MAILGUN_RECEIVER,
+          DATE,
+          true,
+        );
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(jobRepository.save).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if jobRepository.save throws exception', async () => {
+      jest.spyOn(jobRepository, 'create').mockReturnValueOnce({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: undefined,
+      });
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        frequency: 10,
+        message: 'Cron creation test',
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'save').mockRejectedValueOnce(new Error());
+
+      try {
+        await jobService.create(
+          JOB_ID,
+          CRON_ID,
+          process.env.MAILGUN_SENDER,
+          process.env.MAILGUN_RECEIVER,
+          DATE,
+          true,
+        );
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should create a job', async () => {
+      jest.spyOn(jobRepository, 'create').mockReturnValueOnce({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: undefined,
+      });
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        frequency: 10,
+        message: 'Cron creation test',
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'save').mockResolvedValueOnce({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: {
+          id: CRON_ID,
+          message: 'Cron creation test',
+          frequency: 10,
+          jobs: [],
+        },
+      });
+
+      const job = await jobService.create(
+        JOB_ID,
+        CRON_ID,
+        process.env.MAILGUN_SENDER,
+        process.env.MAILGUN_RECEIVER,
+        DATE,
+        true,
+      );
+      expect(job.id).toBe(JOB_ID);
+      expect(job.emailSender).toBe(process.env.MAILGUN_SENDER);
+      expect(job.emailReceiver).toBe(process.env.MAILGUN_RECEIVER);
+      expect(job.sentAt).toBe(DATE);
+      expect(job.isEmailSent).toBe(true);
+    });
   });
 
   describe('getJobHistory', () => {
-    it('should call jobRepository.find', async () => {
-      jest.spyOn(jobRepository, 'find').mockResolvedValue([
+    it('should call cronService.getById', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'find').mockResolvedValueOnce([
         {
           id: JOB_ID,
           emailSender: process.env.MAILGUN_SENDER,
@@ -197,23 +297,124 @@ describe('Job Service', () => {
       ]);
 
       await jobService.getJobHistory(CRON_ID);
+      expect(cronService.getById).toHaveBeenCalledWith(CRON_ID);
+    });
 
+    it('should call jobRepository.find', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'find').mockResolvedValueOnce([
+        {
+          id: JOB_ID,
+          emailSender: process.env.MAILGUN_SENDER,
+          emailReceiver: process.env.MAILGUN_RECEIVER,
+          sentAt: DATE,
+          isEmailSent: true,
+          cron: {
+            id: CRON_ID,
+            message: 'Cron creation test',
+            frequency: 10,
+            jobs: [],
+          },
+        },
+      ]);
+
+      await jobService.getJobHistory(CRON_ID);
       expect(jobRepository.find).toHaveBeenCalledWith({
         where: { cron: CRON_ID },
         take: 10,
       });
     });
 
-    it('should call throw NotFoundException', async () => {
-      jest.spyOn(jobRepository, 'find').mockResolvedValue([]);
+    it('should throw exception if cronService.getById throws exception', async () => {
+      jest.spyOn(cronService, 'getById').mockRejectedValueOnce(new Error());
 
       try {
         await jobService.getJobHistory(CRON_ID);
       } catch (err) {
-        expect(err.message).toBe(
-          `Not found any job related to the cron ${CRON_ID}`,
-        );
+        expect(err).toBeInstanceOf(Error);
+        expect(jobRepository.find).not.toHaveBeenCalled();
       }
+    });
+
+    it('should throw exception if jobRepository.find throws exception', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'find').mockRejectedValueOnce(new Error());
+
+      try {
+        await jobService.getJobHistory(CRON_ID);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should call throw NotFoundException when cron with id does not exist', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(undefined);
+
+      try {
+        await jobService.getJobHistory(CRON_ID);
+      } catch (err) {
+        expect(err).toBeInstanceOf(NotFoundException);
+      }
+    });
+
+    it('should get the job history', async () => {
+      const cron: Cron = {
+        id: '1',
+        frequency: 10,
+        message: 'Cron test email',
+        jobs: [],
+      };
+      const history: Job[] = [
+        {
+          id: '1',
+          emailSender: process.env.MAILGUN_SENDER,
+          emailReceiver: process.env.MAILGUN_RECEIVER,
+          sentAt: DATE,
+          isEmailSent: true,
+          cron,
+        },
+        {
+          id: '2',
+          emailSender: process.env.MAILGUN_SENDER,
+          emailReceiver: process.env.MAILGUN_RECEIVER,
+          sentAt: DATE,
+          isEmailSent: true,
+          cron,
+        },
+        {
+          id: '3',
+          emailSender: process.env.MAILGUN_SENDER,
+          emailReceiver: process.env.MAILGUN_RECEIVER,
+          sentAt: DATE,
+          isEmailSent: true,
+          cron,
+        },
+      ];
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'find').mockResolvedValueOnce(history);
+
+      const jobHistory = await jobService.getJobHistory('1');
+
+      expect(jobHistory).toEqual(history);
     });
   });
 });
