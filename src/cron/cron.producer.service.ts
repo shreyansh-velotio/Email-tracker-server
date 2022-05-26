@@ -22,18 +22,54 @@ export class CronProducerService {
   ) {}
 
   async addCron(dto: CreateCronDto): Promise<Cron> {
-    try {
-      const id: string = uuid();
+    const id: string = uuid();
 
-      // add cron to the queue
+    // add cron to the queue
+    await this.queue.add(
+      id,
+      {
+        message: dto.message,
+      },
+      {
+        repeat: {
+          every: dto.frequency * 1000,
+          /**
+           * @note
+           * Remove the limit option only here for development
+           * so that my email don't get spammed
+           */
+          limit: 3,
+        },
+      },
+    );
+
+    // adding the cron to the db
+    return await this.cronService.create({
+      id,
+      message: dto.message,
+      frequency: dto.frequency,
+    });
+  }
+
+  async updateCron(dto: UpdateCronDto): Promise<Cron> {
+    const cron: Cron = await this.cronService.getById(dto.id);
+
+    if (cron) {
+      const cronFullId = `${cron.id}:::${cron.frequency * 1000}`;
+
+      // remove the old cron from redis
+      await this.queue.removeRepeatableByKey(cronFullId);
+
+      // create a new job with same id and new frequency
       await this.queue.add(
-        id,
+        dto.id,
         {
-          message: dto.message,
+          message: cron.message,
         },
         {
           repeat: {
             every: dto.frequency * 1000,
+
             /**
              * @note
              * Remove the limit option only here for development
@@ -44,64 +80,12 @@ export class CronProducerService {
         },
       );
 
-      // adding the cron to the db
-      return await this.cronService.create({
-        id,
-        message: dto.message,
-        frequency: dto.frequency,
-      });
-    } catch (err) {
-      this.logger.error(err);
-
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async updateCron(dto: UpdateCronDto): Promise<Cron> {
-    try {
-      const cron: Cron = await this.cronService.getById(dto.id);
-
-      if (cron) {
-        const cronFullId = `${cron.id}:::${cron.frequency * 1000}`;
-
-        // remove the old cron from redis
-        await this.queue.removeRepeatableByKey(cronFullId);
-
-        // create a new job with same id and new frequency
-        await this.queue.add(
-          dto.id,
-          {
-            message: cron.message,
-          },
-          {
-            repeat: {
-              every: dto.frequency * 1000,
-
-              /**
-               * @note
-               * Remove the limit option only here for development
-               * so that my email don't get spammed
-               */
-              limit: 3,
-            },
-          },
-        );
-
-        // update the cron in the db
-        return await this.cronService.update(dto);
-      } else {
-        throw new NotFoundException(
-          `Unable to find a cron with the id ${dto.id}`,
-        );
-      }
-    } catch (err) {
-      this.logger.error(err);
-
-      if (err instanceof NotFoundException) {
-        throw new NotFoundException(err.message);
-      }
-
-      throw new InternalServerErrorException();
+      // update the cron in the db
+      return await this.cronService.update(dto);
+    } else {
+      throw new NotFoundException(
+        `Unable to find a cron with the id ${dto.id}`,
+      );
     }
   }
 }

@@ -4,6 +4,9 @@ import { Queue } from 'bull';
 import { CronProducerService } from './cron.producer.service';
 import { CronService } from './cron.service';
 import * as uuid from 'uuid';
+import { CreateCronDto } from './dtos/create-cron.dto';
+import { NotFoundException } from '@nestjs/common';
+import { UpdateCronDto } from './dtos/update-cron.dto';
 
 // mocking the uuid
 const UUID = '046fc812-6764-4850-8657-4b30f4802544';
@@ -62,9 +65,7 @@ describe('Cron Producer Service', () => {
 
   describe('addCron', () => {
     it('should call queue.add', async () => {
-      const id: string = UUID;
-
-      jest.spyOn(uuid, 'v4').mockReturnValue(id);
+      jest.spyOn(uuid, 'v4').mockReturnValue('1');
 
       await cronProducerService.addCron({
         frequency: 10,
@@ -72,7 +73,7 @@ describe('Cron Producer Service', () => {
       });
 
       expect(queue.add).toHaveBeenCalledWith(
-        id,
+        '1',
         {
           message: 'Cron creation test',
         },
@@ -86,7 +87,7 @@ describe('Cron Producer Service', () => {
     });
 
     it('should call cronService.create', async () => {
-      const id: string = UUID;
+      jest.spyOn(uuid, 'v4').mockReturnValue('1');
 
       await cronProducerService.addCron({
         frequency: 10,
@@ -94,10 +95,61 @@ describe('Cron Producer Service', () => {
       });
 
       expect(cronService.create).toHaveBeenCalledWith({
-        id,
+        id: '1',
         frequency: 10,
         message: 'Cron creation test',
       });
+    });
+
+    it('should throw exception if queue.add throws exception', async () => {
+      jest.spyOn(uuid, 'v4').mockReturnValue('1');
+      jest.spyOn(queue, 'add').mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.addCron({
+          frequency: 10,
+          message: 'Cron creation test',
+        });
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(cronService.create).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if cronService.create throws exception', async () => {
+      jest.spyOn(uuid, 'v4').mockReturnValueOnce('1');
+      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
+      jest.spyOn(cronService, 'create').mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.addCron({
+          frequency: 10,
+          message: 'Cron creation test',
+        });
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should add cron to the queue', async () => {
+      const createCronDto: CreateCronDto = {
+        frequency: 10,
+        message: 'Cron creation test',
+      };
+
+      jest.spyOn(uuid, 'v4').mockReturnValueOnce('1');
+      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
+      jest.spyOn(cronService, 'create').mockResolvedValueOnce({
+        id: '1',
+        frequency: 10,
+        message: 'Cron creation test',
+        jobs: [],
+      });
+
+      const cron = await cronProducerService.addCron(createCronDto);
+      expect(cron.id).toBe('1');
+      expect(cron.frequency).toBe(10);
+      expect(cron.message).toBe('Cron creation test');
     });
   });
 
@@ -190,7 +242,96 @@ describe('Cron Producer Service', () => {
       });
     });
 
-    it('should return 404 when cronService.getById is unable to find cron', async () => {
+    it('should throw exception if cronService.getById throws exception', async () => {
+      const updateCronDto: UpdateCronDto = {
+        id: '1',
+        frequency: 20,
+      };
+      jest.spyOn(cronService, 'getById').mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.updateCron(updateCronDto);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(queue.removeRepeatableByKey).not.toHaveBeenCalled();
+        expect(queue.add).not.toHaveBeenCalled();
+        expect(cronService.update).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if queue.removeRepeatableByKey throws exception', async () => {
+      const updateCronDto: UpdateCronDto = {
+        id: '1',
+        frequency: 20,
+      };
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: '1',
+        frequency: 10,
+        message: 'Cron test email',
+        jobs: [],
+      });
+      jest
+        .spyOn(queue, 'removeRepeatableByKey')
+        .mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.updateCron(updateCronDto);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(queue.add).not.toHaveBeenCalled();
+        expect(cronService.update).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if queue.add throws exception', async () => {
+      const updateCronDto: UpdateCronDto = {
+        id: '1',
+        frequency: 20,
+      };
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: '1',
+        frequency: 10,
+        message: 'Cron test email',
+        jobs: [],
+      });
+      jest
+        .spyOn(queue, 'removeRepeatableByKey')
+        .mockResolvedValueOnce(undefined);
+      jest.spyOn(queue, 'add').mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.updateCron(updateCronDto);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(cronService.update).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if cronService.update throws exception', async () => {
+      const updateCronDto: UpdateCronDto = {
+        id: '1',
+        frequency: 20,
+      };
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: '1',
+        frequency: 10,
+        message: 'Cron test email',
+        jobs: [],
+      });
+      jest
+        .spyOn(queue, 'removeRepeatableByKey')
+        .mockResolvedValueOnce(undefined);
+      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
+      jest.spyOn(cronService, 'update').mockRejectedValueOnce(new Error());
+
+      try {
+        await cronProducerService.updateCron(updateCronDto);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should throw NotFoundException when cronService.getById is unable to find cron', async () => {
       const id: string = UUID;
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce(undefined);
@@ -201,8 +342,34 @@ describe('Cron Producer Service', () => {
           frequency: 20,
         });
       } catch (err) {
-        expect(err.message).toBe(`Unable to find a cron with the id ${id}`);
+        expect(err).toBeInstanceOf(NotFoundException);
       }
+    });
+
+    it('should update the cron frequency', async () => {
+      const updateCronDto: UpdateCronDto = {
+        id: '1',
+        frequency: 20,
+      };
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: '1',
+        frequency: 10,
+        message: 'Cron test email',
+        jobs: [],
+      });
+      jest
+        .spyOn(queue, 'removeRepeatableByKey')
+        .mockResolvedValueOnce(undefined);
+      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
+      jest.spyOn(cronService, 'update').mockResolvedValueOnce({
+        id: '1',
+        frequency: 20,
+        message: 'Cron test email',
+        jobs: [],
+      });
+
+      const updatedCron = await cronProducerService.updateCron(updateCronDto);
+      expect(updatedCron.frequency).toBe(20);
     });
   });
 });
