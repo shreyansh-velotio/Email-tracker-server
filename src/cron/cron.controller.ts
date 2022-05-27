@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { CreateCronDto } from './dtos/create-cron.dto';
 import { UpdateCronDto } from './dtos/update-cron.dto';
 import { CronProducerService } from './cron.producer.service';
@@ -9,9 +9,10 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
+import { JwtAuthGaurd } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGaurd)
 @Controller('/cron')
 export class CronController {
   constructor(
