@@ -65,7 +65,7 @@ describe('Cron Service', () => {
     });
 
     it('should get all crons', async () => {
-      jest.spyOn(cronsRepository, 'find').mockResolvedValueOnce([
+      const mockCronsResult = [
         {
           id: '1',
           frequency: 10,
@@ -78,19 +78,15 @@ describe('Cron Service', () => {
           message: 'Cron creation test 2',
           jobs: [],
         },
-      ]);
+      ];
+      jest
+        .spyOn(cronsRepository, 'find')
+        .mockResolvedValueOnce(mockCronsResult);
 
       const crons = await cronService.getAll();
 
       expect(crons.length).toBe(2);
-      expect(crons[0].id).toBe('1');
-      expect(crons[0].frequency).toBe(10);
-      expect(crons[0].message).toBe('Cron creation test 1');
-      expect(crons[0].jobs).toEqual([]);
-      expect(crons[1].id).toBe('2');
-      expect(crons[1].frequency).toBe(20);
-      expect(crons[1].message).toBe('Cron creation test 2');
-      expect(crons[1].jobs).toEqual([]);
+      expect(crons).toEqual(mockCronsResult);
     });
   });
 
@@ -112,19 +108,19 @@ describe('Cron Service', () => {
     });
 
     it('should return the cron', async () => {
-      jest.spyOn(cronsRepository, 'findOne').mockResolvedValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+      jest
+        .spyOn(cronsRepository, 'findOne')
+        .mockResolvedValueOnce(mockCronResult);
 
       const cron = await cronService.getById('1');
 
-      expect(cron.id).toBe('1');
-      expect(cron.frequency).toBe(10);
-      expect(cron.message).toBe('Cron creation test');
-      expect(cron.jobs).toEqual([]);
+      expect(cron).toEqual(mockCronResult);
     });
   });
 
@@ -181,19 +177,15 @@ describe('Cron Service', () => {
     });
 
     it('should create cron', async () => {
-      jest.spyOn(cronsRepository, 'create').mockReturnValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+      jest.spyOn(cronsRepository, 'create').mockReturnValueOnce(mockCronResult);
 
-      jest.spyOn(cronsRepository, 'save').mockResolvedValueOnce({
-        id: '1',
-        frequency: 10,
-        message: 'Cron creation test',
-        jobs: [],
-      });
+      jest.spyOn(cronsRepository, 'save').mockResolvedValueOnce(mockCronResult);
 
       const cron = await cronService.create({
         id: '1',
@@ -201,10 +193,7 @@ describe('Cron Service', () => {
         message: 'Cron creation test',
       });
 
-      expect(cron.id).toBe('1');
-      expect(cron.frequency).toBe(10);
-      expect(cron.message).toBe('Cron creation test');
-      expect(cron.jobs).toEqual([]);
+      expect(cron).toEqual(mockCronResult);
     });
   });
 
@@ -278,6 +267,12 @@ describe('Cron Service', () => {
         id: '1',
         frequency: 20,
       };
+      const mockCronResult = {
+        id: '1',
+        frequency: 20,
+        message: 'Cron creation test',
+        jobs: [],
+      };
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
         id: '1',
@@ -286,17 +281,10 @@ describe('Cron Service', () => {
         jobs: [],
       });
 
-      jest.spyOn(cronsRepository, 'save').mockResolvedValueOnce({
-        id: '1',
-        frequency: 20,
-        message: 'Cron creation test',
-        jobs: [],
-      });
+      jest.spyOn(cronsRepository, 'save').mockResolvedValueOnce(mockCronResult);
 
       const cron = await cronService.update(updateCronDto);
-      expect(cron.id).toBe('1');
-      expect(cron.frequency).toBe(20);
-      expect(cron.message).toBe('Cron creation test');
+      expect(cron).toEqual(mockCronResult);
     });
   });
 
@@ -353,23 +341,19 @@ describe('Cron Service', () => {
     });
 
     it('should delete the cron', async () => {
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
-      jest.spyOn(cronsRepository, 'remove').mockResolvedValueOnce({
-        id: '1',
-        frequency: 10,
-        message: 'Cron creation test',
-        jobs: [],
-      });
+      };
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
+      jest
+        .spyOn(cronsRepository, 'remove')
+        .mockResolvedValueOnce(mockCronResult);
 
       const deletedCron = await cronService.delete('1');
-      expect(deletedCron.id).toBe('1');
-      expect(deletedCron.frequency).toBe(10);
-      expect(deletedCron.message).toBe('Cron creation test');
+      expect(deletedCron).toEqual(mockCronResult);
     });
   });
 });
