@@ -263,11 +263,19 @@ describe('Job Service', () => {
         DATE,
         true,
       );
-      expect(job.id).toBe(JOB_ID);
-      expect(job.emailSender).toBe(process.env.MAILGUN_SENDER);
-      expect(job.emailReceiver).toBe(process.env.MAILGUN_RECEIVER);
-      expect(job.sentAt).toBe(DATE);
-      expect(job.isEmailSent).toBe(true);
+      expect(job).toEqual({
+        id: JOB_ID,
+        emailSender: process.env.MAILGUN_SENDER,
+        emailReceiver: process.env.MAILGUN_RECEIVER,
+        sentAt: DATE,
+        isEmailSent: true,
+        cron: {
+          id: CRON_ID,
+          message: 'Cron creation test',
+          frequency: 10,
+          jobs: [],
+        },
+      });
     });
   });
 
