@@ -7,6 +7,7 @@ import config from '../ormconfig';
 import { CronModule } from './cron/cron.module';
 import { JobModule } from './job/job.module';
 import { AppController } from './app.controller';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AppController } from './app.controller';
     TypeOrmModule.forRoot(config),
     CronModule,
     JobModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
