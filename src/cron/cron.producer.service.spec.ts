@@ -136,33 +136,33 @@ describe('Cron Producer Service', () => {
         frequency: 10,
         message: 'Cron creation test',
       };
-
-      jest.spyOn(uuid, 'v4').mockReturnValueOnce('1');
-      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
-      jest.spyOn(cronService, 'create').mockResolvedValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(uuid, 'v4').mockReturnValueOnce('1');
+      jest.spyOn(queue, 'add').mockResolvedValueOnce(undefined);
+      jest.spyOn(cronService, 'create').mockResolvedValueOnce(mockCronResult);
 
       const cron = await cronProducerService.addCron(createCronDto);
-      expect(cron.id).toBe('1');
-      expect(cron.frequency).toBe(10);
-      expect(cron.message).toBe('Cron creation test');
+      expect(cron).toEqual(mockCronResult);
     });
   });
 
   describe('updateCron', () => {
     it('should call cronService.getById', async () => {
       const id: string = UUID;
-
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
-        id,
+      const mockCronResult = {
+        id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
 
       await cronProducerService.updateCron({
         id,
@@ -174,13 +174,14 @@ describe('Cron Producer Service', () => {
 
     it('should call queue.removeRepeatableByKey', async () => {
       const id: string = UUID;
-
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+      const mockCronResult = {
         id,
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
 
       const cronFullId = id + ':::' + 10000;
 
@@ -194,13 +195,14 @@ describe('Cron Producer Service', () => {
 
     it('should call queue.add', async () => {
       const id: string = UUID;
-
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+      const mockCronResult = {
         id,
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
 
       await cronProducerService.updateCron({
         id,
@@ -223,13 +225,14 @@ describe('Cron Producer Service', () => {
 
     it('should call cronService.update', async () => {
       const id: string = UUID;
-
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
-        id,
+      const mockCronResult = {
+        id: '1',
         frequency: 10,
         message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
 
       await cronProducerService.updateCron({
         id,
@@ -288,12 +291,14 @@ describe('Cron Producer Service', () => {
         id: '1',
         frequency: 20,
       };
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
-        message: 'Cron test email',
+        message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
       jest
         .spyOn(queue, 'removeRepeatableByKey')
         .mockResolvedValueOnce(undefined);
@@ -312,12 +317,14 @@ describe('Cron Producer Service', () => {
         id: '1',
         frequency: 20,
       };
-      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+      const mockCronResult = {
         id: '1',
         frequency: 10,
-        message: 'Cron test email',
+        message: 'Cron creation test',
         jobs: [],
-      });
+      };
+
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce(mockCronResult);
       jest
         .spyOn(queue, 'removeRepeatableByKey')
         .mockResolvedValueOnce(undefined);
