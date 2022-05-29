@@ -3,17 +3,32 @@ import {
   ConflictException,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiInternalServerErrorResponse,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { UserService } from './user/user.service';
 import { CreateUserDto } from './user/dtos/create-user.dto';
 import { LocalAuthGaurd } from './auth/guards/local-auth.guard';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGaurd } from './auth/guards/jwt-auth.guard';
+import { User } from './user/entities/user.entity';
+import { SigninUserDto } from './user/dtos/signin-user.dto';
+
+interface SigninResponse {
+  id: string;
+  username: string;
+  name: string;
+  role: string;
+  jwt: string;
+}
 
 @Controller('')
 export class AppController {
@@ -34,7 +49,8 @@ export class AppController {
 
   @UseGuards(LocalAuthGaurd)
   @Post('sign-in')
-  async signIn(@Request() req: any) {
+  @HttpCode(HttpStatus.OK)
+  async signIn(@Body() dto: SigninUserDto, @Request() req: any) {
     const jwt = await this.authService.getJwt(req.user);
 
     return {
@@ -44,7 +60,6 @@ export class AppController {
   }
 
   @Get('ping')
-  @ApiOkResponse({ description: 'Base route' })
   getHello() {
     return this.appService.getHello();
   }

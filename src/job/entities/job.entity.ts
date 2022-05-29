@@ -12,6 +12,7 @@ export class Job {
   @ApiProperty({
     type: String,
     description: 'Job id',
+    example: 'repeat:3d3d35f16a53906c841e09da946fa35b:1653071610000',
   })
   id: string;
 
@@ -26,6 +27,7 @@ export class Job {
   @ApiProperty({
     type: String,
     description: 'Email id of the sender',
+    example: 'mailgun@sandboxe9453fed1fd14b5d97fbf12c3fe1218e.mailgun.org',
   })
   emailSender: string;
 
@@ -33,6 +35,7 @@ export class Job {
   @ApiProperty({
     type: String,
     description: 'Email id of the receiver',
+    example: 'shreyansh.shrey@velotio.com',
   })
   emailReceiver: string;
 
@@ -40,6 +43,7 @@ export class Job {
   @ApiProperty({
     type: Date,
     description: 'Timestamp when email was sent',
+    example: new Date(),
   })
   sentAt: Date;
 
@@ -47,6 +51,7 @@ export class Job {
   @ApiProperty({
     type: Boolean,
     description: 'Email sent status',
+    example: true,
   })
   isEmailSent: Boolean;
 }

@@ -9,6 +9,7 @@ export class CreateCronDto {
   @ApiProperty({
     type: Number,
     description: 'Interval b/w two cron jobs',
+    example: 30,
   })
   frequency: number;
 
@@ -16,6 +17,7 @@ export class CreateCronDto {
   @ApiProperty({
     type: String,
     description: 'Email content',
+    example: 'Drink Water!',
   })
   message: string;
 }

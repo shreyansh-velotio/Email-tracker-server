@@ -8,6 +8,7 @@ export class Cron {
   @ApiProperty({
     type: String,
     description: 'Cron id',
+    example: '511fb15e-f60c-4c90-8e20-96ef1dc7d824',
   })
   id: string;
 
@@ -15,6 +16,7 @@ export class Cron {
   @ApiProperty({
     type: Number,
     description: 'Interval b/w two cron jobs',
+    example: 30,
   })
   frequency: number;
 
@@ -22,6 +24,7 @@ export class Cron {
   @ApiProperty({
     type: String,
     description: 'Email content',
+    example: 'Drink Water!',
   })
   message: string;
 
