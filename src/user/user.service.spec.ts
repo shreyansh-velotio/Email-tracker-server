@@ -9,7 +9,7 @@ import * as bcrypt from '../utils/bcrypt.service';
 const mockUser: User = {
   id: 1,
   username: 'test1@admin.com',
-  password: 'hashed-password',
+  password: 'password',
   name: 'Tester 1',
   role: 'admin',
 };
@@ -82,7 +82,7 @@ describe('UserService', () => {
     });
 
     it('should throw exception if userRepository.find throws exception', async () => {
-      jest.spyOn(userRepository, 'find').mockRejectedValue(new Error());
+      jest.spyOn(userRepository, 'find').mockRejectedValueOnce(new Error());
 
       try {
         await userService.getAll();
@@ -92,7 +92,7 @@ describe('UserService', () => {
     });
 
     it('should return all the users', async () => {
-      jest.spyOn(userRepository, 'find').mockResolvedValue(mockUsers);
+      jest.spyOn(userRepository, 'find').mockResolvedValueOnce(mockUsers);
 
       const users = await userService.getAll();
       expect(users).toEqual(mockUsers);
@@ -109,7 +109,7 @@ describe('UserService', () => {
     });
 
     it('should throw exception if userRepository.findOne throws exception', async () => {
-      jest.spyOn(userRepository, 'findOne').mockRejectedValue(new Error());
+      jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new Error());
 
       try {
         await userService.getByUsername('test1@admin.com');
@@ -119,7 +119,7 @@ describe('UserService', () => {
     });
 
     it('should return a user', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
 
       const user = await userService.getByUsername('test1@admin.com');
       expect(user).toEqual(mockUser);
@@ -130,7 +130,7 @@ describe('UserService', () => {
     it('should call userRepository.create', async () => {
       jest
         .spyOn(bcrypt, 'hashPw')
-        .mockReturnValue(
+        .mockReturnValueOnce(
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
         );
       await userService.create(mockDto);
@@ -147,10 +147,10 @@ describe('UserService', () => {
     it('should call userRepository.save', async () => {
       jest
         .spyOn(bcrypt, 'hashPw')
-        .mockReturnValue(
+        .mockReturnValueOnce(
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
         );
-      jest.spyOn(userRepository, 'create').mockReturnValue({
+      jest.spyOn(userRepository, 'create').mockReturnValueOnce({
         ...mockUser,
         password:
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
@@ -167,15 +167,15 @@ describe('UserService', () => {
     it('should throw exception if userRepository.save throws exception', async () => {
       jest
         .spyOn(bcrypt, 'hashPw')
-        .mockReturnValue(
+        .mockReturnValueOnce(
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
         );
-      jest.spyOn(userRepository, 'create').mockReturnValue({
+      jest.spyOn(userRepository, 'create').mockReturnValueOnce({
         ...mockUser,
         password:
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
       });
-      jest.spyOn(userRepository, 'save').mockRejectedValue(new Error());
+      jest.spyOn(userRepository, 'save').mockRejectedValueOnce(new Error());
 
       try {
         await userService.create(mockDto);
@@ -187,15 +187,15 @@ describe('UserService', () => {
     it('should create a user', async () => {
       jest
         .spyOn(bcrypt, 'hashPw')
-        .mockReturnValue(
+        .mockReturnValueOnce(
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
         );
-      jest.spyOn(userRepository, 'create').mockReturnValue({
+      jest.spyOn(userRepository, 'create').mockReturnValueOnce({
         ...mockUser,
         password:
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',
       });
-      jest.spyOn(userRepository, 'save').mockResolvedValue({
+      jest.spyOn(userRepository, 'save').mockResolvedValueOnce({
         ...mockUser,
         password:
           '$2a$10$eo8SenGbc0nkxX81avQ4jee7UsljIVCDKWOMh5XasVw7xjJXpsZO6',

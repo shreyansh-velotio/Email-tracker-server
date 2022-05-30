@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { SigninUserDto } from '../user/dtos/signin-user.dto';
-import { comparePw } from 'src/utils/bcrypt.service';
+import { comparePw } from '../utils/bcrypt.service';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 
