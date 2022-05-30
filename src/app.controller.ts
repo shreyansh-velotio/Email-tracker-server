@@ -19,7 +19,6 @@ import { UserService } from './user/user.service';
 import { CreateUserDto } from './user/dtos/create-user.dto';
 import { LocalAuthGaurd } from './auth/guards/local-auth.guard';
 import { AuthService } from './auth/auth.service';
-import { User } from './user/entities/user.entity';
 import { SigninUserDto } from './user/dtos/signin-user.dto';
 
 interface SigninResponse {
