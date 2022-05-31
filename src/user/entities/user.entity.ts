@@ -39,7 +39,7 @@ export class User {
   @ApiProperty({
     type: String,
     description: 'Role',
-    example: 'Admin',
+    example: 'admin',
   })
   role: string;
 }

@@ -34,7 +34,7 @@ export class CreateUserDto {
   @ApiProperty({
     type: String,
     description: 'Role',
-    example: 'Admin',
+    example: 'admin',
   })
   role: string;
 }

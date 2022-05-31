@@ -5,10 +5,8 @@
   "compilerOptions": {
     "plugins": [
       {
-        "name": "@nestjs/swagger/plugin",
+        "name": "@nestjs/swagger",
         "options": {
-          "classValidatorShim": true,
-          "dtoFileNameSuffix": [".dto.ts", ".entity.ts"],
           "introspectComments": true
         }
       }

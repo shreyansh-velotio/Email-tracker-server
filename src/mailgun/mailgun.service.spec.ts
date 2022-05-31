@@ -29,6 +29,7 @@ describe('Mailgun Service', () => {
   it('MAILGUN_SENDER should be defined', () => {
     expect(process.env.MAILGUN_SENDER).toBeDefined();
   });
+
   it('MAILGUN_RECEIVER should be defined', () => {
     expect(process.env.MAILGUN_RECEIVER).toBeDefined();
   });
@@ -40,6 +41,6 @@ describe('Mailgun Service', () => {
       });
 
       expect(res.status).toBe(200);
-    });
+    }, 10000);
   });
 });

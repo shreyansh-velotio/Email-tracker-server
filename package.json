@@ -93,8 +93,7 @@
       "**/*.(t|j)s"
     ],
     "coveragePathIgnorePatterns": [
-      "migrations",
-      ".dto.ts"
+      "migrations"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
