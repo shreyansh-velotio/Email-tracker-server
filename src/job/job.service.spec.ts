@@ -7,6 +7,18 @@ import { JobService } from './job.service';
 import { NotFoundException } from '@nestjs/common';
 import { Cron } from '../cron/entities/cron.entity';
 
+type HistoryResult = {
+  next?: {
+    page: number;
+    limit: number;
+  };
+  previous?: {
+    page: number;
+    limit: number;
+  };
+  result: Job[];
+};
+
 describe('Job Service', () => {
   let jobService: JobService;
   let cronService: CronService;
@@ -30,6 +42,7 @@ describe('Job Service', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+            count: jest.fn(),
           },
         },
         {
@@ -308,6 +321,22 @@ describe('Job Service', () => {
       expect(cronService.getById).toHaveBeenCalledWith(CRON_ID);
     });
 
+    it('should call jobRepository.count', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+
+      jest.spyOn(jobRepository, 'count').mockResolvedValueOnce(15);
+
+      await jobService.getJobHistory(CRON_ID);
+      expect(jobRepository.count).toHaveBeenCalledWith({
+        where: { cron: CRON_ID },
+      });
+    });
+
     it('should call jobRepository.find', async () => {
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
         id: CRON_ID,
@@ -315,6 +344,8 @@ describe('Job Service', () => {
         frequency: 10,
         jobs: [],
       });
+
+      jest.spyOn(jobRepository, 'count').mockResolvedValueOnce(15);
 
       jest.spyOn(jobRepository, 'find').mockResolvedValueOnce([
         {
@@ -332,15 +363,33 @@ describe('Job Service', () => {
         },
       ]);
 
-      await jobService.getJobHistory(CRON_ID);
+      await jobService.getJobHistory(CRON_ID, 2);
       expect(jobRepository.find).toHaveBeenCalledWith({
         where: { cron: CRON_ID },
-        take: 10,
+        take: 5,
+        skip: 5,
       });
     });
 
     it('should throw exception if cronService.getById throws exception', async () => {
       jest.spyOn(cronService, 'getById').mockRejectedValueOnce(new Error());
+
+      try {
+        await jobService.getJobHistory(CRON_ID);
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(jobRepository.find).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should throw exception if cronService.count throws exception', async () => {
+      jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
+        id: CRON_ID,
+        message: 'Cron creation test',
+        frequency: 10,
+        jobs: [],
+      });
+      jest.spyOn(jobRepository, 'count').mockRejectedValueOnce(new Error());
 
       try {
         await jobService.getJobHistory(CRON_ID);
@@ -410,6 +459,17 @@ describe('Job Service', () => {
           cron,
         },
       ];
+      const result: HistoryResult = {
+        next: {
+          page: 3,
+          limit: 5,
+        },
+        previous: {
+          page: 1,
+          limit: 5,
+        },
+        result: history,
+      };
 
       jest.spyOn(cronService, 'getById').mockResolvedValueOnce({
         id: CRON_ID,
@@ -418,11 +478,13 @@ describe('Job Service', () => {
         jobs: [],
       });
 
+      jest.spyOn(jobRepository, 'count').mockResolvedValueOnce(15);
+
       jest.spyOn(jobRepository, 'find').mockResolvedValueOnce(history);
 
-      const jobHistory = await jobService.getJobHistory('1');
+      const jobHistory = await jobService.getJobHistory('1', 2, 5);
 
-      expect(jobHistory).toEqual(history);
+      expect(jobHistory).toEqual(result);
     });
   });
 });

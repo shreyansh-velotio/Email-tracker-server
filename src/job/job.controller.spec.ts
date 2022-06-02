@@ -35,9 +35,13 @@ describe('Job controller', () => {
 
   describe('GET /cron-job/history', () => {
     it('should call jobService.getJobHistory', async () => {
-      await jobController.getJobs(UUID);
+      await jobController.getJobs({
+        id: UUID,
+        page: 2,
+        limit: 5,
+      });
 
-      expect(jobService.getJobHistory).toBeCalledWith(UUID);
+      expect(jobService.getJobHistory).toBeCalledWith(UUID, 2, 5);
     });
   });
 });
