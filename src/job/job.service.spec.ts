@@ -8,6 +8,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Cron } from '../cron/entities/cron.entity';
 
 type HistoryResult = {
+  total: number;
   next?: {
     page: number;
     limit: number;
@@ -460,6 +461,7 @@ describe('Job Service', () => {
         },
       ];
       const result: HistoryResult = {
+        total: 15,
         next: {
           page: 3,
           limit: 5,

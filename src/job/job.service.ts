@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CronService } from '../cron/cron.service';
 
 type HistoryResult = {
+  total: number;
   next?: {
     page: number;
     limit: number;
@@ -54,8 +55,8 @@ export class JobService {
   ): Promise<HistoryResult> {
     const cron = await this.cronService.getById(cronId);
     if (cron) {
-      const cronJobPage = page ? page : 1;
-      const cronJobLimit = limit ? limit : 5;
+      const cronJobPage = page && page > 0 ? page : 1;
+      const cronJobLimit = limit && limit > 0 ? limit : 5;
 
       const startIndex = (cronJobPage - 1) * cronJobLimit;
       const endIndex = cronJobPage * cronJobLimit;
@@ -65,6 +66,7 @@ export class JobService {
       });
 
       const results: HistoryResult = {
+        total: totalResult,
         previous:
           startIndex > 0
             ? {
