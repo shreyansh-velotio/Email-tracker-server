@@ -9,7 +9,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   const options = new DocumentBuilder()
     .setTitle('Email Tracker API')
