@@ -9,14 +9,6 @@ import { Cron } from '../cron/entities/cron.entity';
 
 type HistoryResult = {
   total: number;
-  next?: {
-    page: number;
-    limit: number;
-  };
-  previous?: {
-    page: number;
-    limit: number;
-  };
   result: Job[];
 };
 
@@ -462,14 +454,6 @@ describe('Job Service', () => {
       ];
       const result: HistoryResult = {
         total: 15,
-        next: {
-          page: 3,
-          limit: 5,
-        },
-        previous: {
-          page: 1,
-          limit: 5,
-        },
         result: history,
       };
 

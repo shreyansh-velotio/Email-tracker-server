@@ -6,14 +6,6 @@ import { CronService } from '../cron/cron.service';
 
 type HistoryResult = {
   total: number;
-  next?: {
-    page: number;
-    limit: number;
-  };
-  previous?: {
-    page: number;
-    limit: number;
-  };
   result: Job[];
 };
 
@@ -55,11 +47,10 @@ export class JobService {
   ): Promise<HistoryResult> {
     const cron = await this.cronService.getById(cronId);
     if (cron) {
-      const cronJobPage = page && page > 0 ? page : 1;
-      const cronJobLimit = limit && limit > 0 ? limit : 5;
+      const skip = page && page > 0 ? page : 1;
+      const take = limit && limit > 0 ? limit : 5;
 
-      const startIndex = (cronJobPage - 1) * cronJobLimit;
-      const endIndex = cronJobPage * cronJobLimit;
+      const offset = (skip - 1) * take;
 
       const totalResult = await this.jobRepository.count({
         where: { cron: cronId },
@@ -67,24 +58,10 @@ export class JobService {
 
       const results: HistoryResult = {
         total: totalResult,
-        previous:
-          startIndex > 0
-            ? {
-                page: cronJobPage - 1,
-                limit: cronJobLimit,
-              }
-            : undefined,
-        next:
-          endIndex < totalResult
-            ? {
-                page: cronJobPage + 1,
-                limit: cronJobLimit,
-              }
-            : undefined,
         result: await this.jobRepository.find({
           where: { cron: cronId },
-          take: cronJobLimit,
-          skip: startIndex,
+          take,
+          skip: offset,
         }),
       };
 
